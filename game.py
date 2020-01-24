@@ -1,10 +1,14 @@
 import pygame, random
 from pygame.locals import *
 
+pygame.init()
+
 screen_width = 500
 screen_height = 700
 screen_grid = 10
 game_velocity = 5
+font = pygame.font.SysFont('Kinnari.ttf', 30)
+score = 0
 
 def location_random():
     x = random.randint(0, screen_width - screen_grid)
@@ -13,8 +17,6 @@ def location_random():
 
 def collision(obj1, obj2):
     return (obj1[0] == obj2[0]) and (obj1[1] == obj2[1])
-
-pygame.init()
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Snake Game 1.0')
@@ -27,7 +29,8 @@ snake_body2.fill((107, 66, 38))
 
 apple_location = location_random()
 apple = pygame.Surface((screen_grid, screen_grid))
-apple.fill((255, 0, 0))
+apple_collors = [(50,205,50), (255, 0, 0), (0, 0, 255)]
+apple.fill(apple_collors[random.randint(0, len(apple_collors) - 1)])
 
 direction = 'LEFT'
 clock = pygame.time.Clock()
@@ -51,9 +54,11 @@ while True:
             direction = direction(event.key)
 
     if collision(snake[0], apple_location):
+        apple.fill(apple_collors[random.randint(0, len(apple_collors) - 1)])        
         apple_location = location_random()
         snake.append((0, 0))
         game_velocity += 1
+        score += 1
 
     #makes the snake crawl
     for i in range(len(snake) - 1, 0, -1):
@@ -77,5 +82,10 @@ while True:
             screen.blit(snake_body1, snake[i])
         else:
             screen.blit(snake_body2, snake[i])
+    
+    score_font = font.render('Score: %s' % (score), True, (0, 0, 0))
+    score_rect = score_font.get_rect()
+    score_rect.topleft = (screen_width - 120, 10)
+    screen.blit(score_font, score_rect)
 
     pygame.display.update()
