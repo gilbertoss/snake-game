@@ -15,8 +15,17 @@ def location_random():
     y = random.randint(0, screen_width - screen_grid)
     return (x//screen_grid * screen_grid, y//screen_grid * screen_grid)
 
-def collision(obj1, obj2):
+def food_collision(obj1, obj2):
     return (obj1[0] == obj2[0]) and (obj1[1] == obj2[1])
+
+def boundaries_collision():
+    return snake[0][0] == screen_width or snake[0][1] == screen_height or snake[0][0] < 0 or snake[0][1] < 0
+
+def body_collision():
+    for i in range(1, len(snake) - 1):
+        if snake[0][0] == snake[i][0] and snake[0][1] == snake[i][1]:
+            return True
+    return False
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Snake Game 1.0')
@@ -53,12 +62,18 @@ while True:
                 return switcher.get(i, "LEFT")
             direction = direction(event.key)
 
-    if collision(snake[0], apple_location):
+    if food_collision(snake[0], apple_location):
         apple.fill(apple_collors[random.randint(0, len(apple_collors) - 1)])        
         apple_location = location_random()
         snake.append((0, 0))
         game_velocity += 1
         score += 1
+    
+    if boundaries_collision():
+        print('game over')
+    
+    if body_collision():
+        print('game over.')
 
     #makes the snake crawl
     for i in range(len(snake) - 1, 0, -1):
